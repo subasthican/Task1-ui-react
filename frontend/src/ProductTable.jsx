@@ -4,6 +4,7 @@ import axios from 'axios'
 function ProductTable() {
     const [products, setProducts] = useState([]);
     const [show, setShow] = useState(false);
+    const [editProduct,setEditProduct] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -63,42 +64,58 @@ function ProductTable() {
     };
 
     const handleSubmit = (e) => {
-        e.preventDefault();
+    e.preventDefault();
 
-        if (!validateForm()) {
-            return;
-        }
+    if (!validateForm()) {
+        return;
+    }
 
-        axios
-            .post('http://localhost:5001/api/products', formData)
-            .then((res) => {
-                console.log(res.data);
-                setShow(false);
-                setFormData({
-                    name: '',
-                    description: '',
-                    price: '',
-                    lowStockThreshold: '',
-                    category: '',
-                    warranty: ''
-                });
-                setErrors({});
-                fetchProducts();
-                alert("Product saved successfully!");
-            })
-            .catch((err) => {
-                console.log(err);
-                alert("Failed to save: " + (err.response?.data?.message || err.message));
+    const request = editProduct
+        ? axios.put(`http://localhost:5001/api/products/${editProduct}`, formData)
+        : axios.post('http://localhost:5001/api/products', formData);
+
+    request
+        .then((res) => {
+            console.log(res.data);
+            setShow(false);
+            setEditProduct(null);
+            setFormData({
+                name: '',
+                description: '',
+                price: '',
+                lowStockThreshold: '',
+                category: '',
+                warranty: ''
             });
-    };
+            setErrors({});
+            fetchProducts();
+            alert(editProduct ? "Product updated successfully!" : "Product saved successfully!");
+        })
+        .catch((err) => {
+            console.log(err);
+            alert("Failed to save: " + (err.response?.data?.message || err.message));
+        });
+};
 
     return (
         <div className='m-4'>
             <div className='m-4 flex gap-4'>
                 <p className='text-3xl'>Product Table</p>
                 <button
-                    onClick={() => setShow(true)}
-                    className='border p-2 rounded bg-blue-400 hover:bg-blue-500 text-white'
+                    onClick={() => {
+                        setShow(true);
+                        setEditProduct(null);
+                        setFormData({
+                            name: '',
+                            description: '',
+                            price: '',
+                            lowStockThreshold: '',
+                            category: '',
+                            warranty: ''
+                        });
+                        setErrors({});
+                    }}
+                    className='border p-2 rounded-2xl bg-blue-400 hover:bg-blue-500 text-white'
                 >
                     Add Product
                 </button>
@@ -116,6 +133,8 @@ function ProductTable() {
                             <th className='border p-4'>Low Stock Threshold</th>
                             <th className='border p-4'>Category</th>
                             <th className='border p-4'>Warranty</th>
+                            <th className='border p-4'>Action</th>
+                                     
                         </tr>
                     </thead>
                     <tbody>
@@ -127,6 +146,23 @@ function ProductTable() {
                                 <td className='border p-4'>{product.lowStockThreshold}</td>
                                 <td className='border p-4'>{product.category}</td>
                                 <td className='border p-4'>{product.warranty}</td>
+                                <td className='border p-4'><button  
+                                                                className='border p-2 rounded-2xl bg-blue-700 hover:bg-blue-900 text-white shadow-xl' 
+                                                                type='button'
+                                                                onClick={()=>{
+                                                                    setShow(true);
+                                                                    setEditProduct(product._id)
+                                                                    setFormData({
+                                                                        name: product.name,
+                                                                        description: product.description,
+                                                                        price: product.price,
+                                                                        lowStockThreshold:product.lowStockThreshold,
+                                                                        category: product.category,
+                                                                        warranty: product.warranty
+                                                                    });
+                                                                    setErrors({});
+                                                                }}
+                                                                >Update</button></td>
                             </tr>
                         ))}
                     </tbody>
@@ -136,7 +172,9 @@ function ProductTable() {
             {show && (
                 <div className="fixed inset-0 bg-gray-200/80 flex justify-center items-center z-50">
                     <div className="bg-white p-6 rounded w-96 shadow-lg">
-                        <h2 className="text-xl font-bold mb-4">Add Product</h2>
+                            <h2 className="text-xl font-bold mb-4">
+                                {editProduct ? "Update Product" : "Add Product"}
+                            </h2>
                         <form onSubmit={handleSubmit}>
                             <input
                                 type="text"
@@ -206,18 +244,30 @@ function ProductTable() {
                             {errors.warranty && <p className="text-red-500 text-sm mb-2">{errors.warranty}</p>}
 
                             <div className="flex justify-end gap-2 mt-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setShow(false)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                >
-                                    Cancel
-                                </button>
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setShow(false);
+                                    setEditProduct(null);
+                                    setErrors({});
+                                    setFormData({
+                                        name: '',
+                                        description: '',
+                                        price: '',
+                                        lowStockThreshold: '',
+                                        category: '',
+                                        warranty: ''
+                                    });
+                                }}
+                                className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                            >
+                                Cancel
+                            </button>
                                 <button
                                     type="submit"
                                     className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                                 >
-                                    Save
+                                    {editProduct ? "Update" : "Save"}
                                 </button>
                             </div>
                         </form>
