@@ -5,6 +5,7 @@ function ProductTable() {
     const [products, setProducts] = useState([]);
     const [show, setShow] = useState(false);
     const [editProduct,setEditProduct] = useState(null);
+    
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -162,7 +163,8 @@ function ProductTable() {
                                                                     });
                                                                     setErrors({});
                                                                 }}
-                                                                >Update</button></td>
+                                                                >Update</button>
+                                                                </td>
                             </tr>
                         ))}
                     </tbody>
