@@ -12,39 +12,65 @@ function ProductTable() {
         category: '',
         warranty: ''
     });
+    const [errors, setErrors] = useState({});
 
-  
     const fetchProducts = () => {
-        const token = localStorage.getItem('token');
         axios
-            .get('http://localhost:5001/api/products', {
-                headers: { Authorization: `Bearer ${token}` }
-            })
+            .get('http://localhost:5001/api/products')
             .then((res) => {
-                console.log(res.data);
                 setProducts(res.data.data?.products || []);
             })
             .catch((err) => console.log(err));
     };
 
-  
     useEffect(() => {
         fetchProducts();
     }, []);
 
+    const validateForm = () => {
+        let newErrors = {};
+
+        if (!formData.name.trim()) {
+            newErrors.name = "Product name is required";
+        }
+
+        if (!formData.description.trim()) {
+            newErrors.description = "Description is required";
+        }
+
+        if (!formData.price) {
+            newErrors.price = "Price is required";
+        } else if (Number(formData.price) <= 0) {
+            newErrors.price = "Price must be greater than 0";
+        }
+
+        if (!formData.lowStockThreshold) {
+            newErrors.lowStockThreshold = "Low stock threshold is required";
+        } else if (Number(formData.lowStockThreshold) < 0) {
+            newErrors.lowStockThreshold = "Low stock threshold cannot be negative";
+        }
+
+        if (!formData.category.trim()) {
+            newErrors.category = "Category is required";
+        }
+
+        if (!formData.warranty.trim()) {
+            newErrors.warranty = "Warranty is required";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        const token = localStorage.getItem('token');
 
-        if (!token) {
-        alert("Please login first! No token found.");
-        return;
-    }
+        if (!validateForm()) {
+            return;
+        }
 
         axios
-            .post('http://localhost:5001/api/products', formData, {
-                headers: { Authorization: `Bearer ${token}` }
-            })
+            .post('http://localhost:5001/api/products', formData)
             .then((res) => {
                 console.log(res.data);
                 setShow(false);
@@ -56,16 +82,13 @@ function ProductTable() {
                     category: '',
                     warranty: ''
                 });
+                setErrors({});
                 fetchProducts();
                 alert("Product saved successfully!");
             })
             .catch((err) => {
                 console.log(err);
-                if (err.response?.status === 401) {
-                alert("Invalid or expired token. Please login again.");
-            } else {
                 alert("Failed to save: " + (err.response?.data?.message || err.message));
-            }
             });
     };
 
@@ -118,51 +141,69 @@ function ProductTable() {
                             <input
                                 type="text"
                                 placeholder="Product Name"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.name}
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, name: e.target.value });
+                                setErrors({ ...errors, name: '' });
+                            }}
                             />
+                            {errors.name && <p className="text-red-500 text-sm mb-2">{errors.name}</p>}
+
                             <input
                                 type="text"
                                 placeholder="Description"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, description: e.target.value });
+                                setErrors({ ...errors, description: '' });
+                            
+                            }}
                             />
+                            {errors.description && <p className="text-red-500 text-sm mb-2">{errors.description}</p>}
+
                             <input
                                 type="number"
                                 placeholder="Price"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, price: e.target.value });
+                                setErrors({ ...errors, price: '' });
+                            }}
                             />
+                            {errors.price && <p className="text-red-500 text-sm mb-2">{errors.price}</p>}
+
                             <input
                                 type="number"
                                 placeholder="Low Stock Threshold"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.lowStockThreshold}
-                                onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, lowStockThreshold: e.target.value });
+                                setErrors({ ...errors, lowStockThreshold: '' });
+                            }}
                             />
+                            {errors.lowStockThreshold && <p className="text-red-500 text-sm mb-2">{errors.lowStockThreshold}</p>}
+
                             <input
                                 type="text"
                                 placeholder="Category"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, category: e.target.value });
+                                setErrors({ ...errors, category: '' });
+                            }}
                             />
+                            {errors.category && <p className="text-red-500 text-sm mb-2">{errors.category}</p>}
+
                             <input
                                 type="text"
                                 placeholder="Warranty"
-                                className="border p-2 w-full mb-2"
-                                required
+                                className="border p-2 w-full mb-1"
                                 value={formData.warranty}
-                                onChange={(e) => setFormData({ ...formData, warranty: e.target.value })}
+                                onChange={(e) => {setFormData({ ...formData, warranty: e.target.value });
+                                setErrors({ ...errors, warranty: '' });
+                            }}
                             />
+                            {errors.warranty && <p className="text-red-500 text-sm mb-2">{errors.warranty}</p>}
 
                             <div className="flex justify-end gap-2 mt-4">
                                 <button
