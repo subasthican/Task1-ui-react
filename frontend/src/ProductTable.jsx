@@ -147,7 +147,8 @@ function ProductTable() {
             {products.length === 0 ? (
                 <p>No products found</p>
             ) : (
-                <table className='border border-collapse w-full'>
+                <div className="overflow-x-auto">
+                <table className=' min-w-[900px] border border-collapse w-full'>
                     <thead className='bg-gray-100'>
                         <tr>
                             <th className='border p-4'>Name</th>
@@ -162,7 +163,7 @@ function ProductTable() {
                     </thead>
                     <tbody>
                         {products.map((product) => (
-                            <tr key={product._id}>
+                            <tr key={product?._id}>
                                 <td className='border p-4'>{product.name}</td>
                                 <td className='border p-4'>{product.description}</td>
                                 <td className='border p-4'>{product.price}</td>
@@ -195,6 +196,7 @@ function ProductTable() {
                         ))}
                     </tbody>
                 </table>
+                </div>
             )}
 
             {show && (
@@ -306,4 +308,4 @@ function ProductTable() {
     )
 }
 
-export default ProductTable
+export default ProductTable 
