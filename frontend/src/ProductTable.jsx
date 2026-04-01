@@ -97,6 +97,28 @@ function ProductTable() {
             alert("Failed to save: " + (err.response?.data?.message || err.message));
         });
 };
+        const handleDelete = (id) =>{
+            const conformDelete = window.confirm("are you want to delete this one?");
+
+            if(!conformDelete)
+            {
+                return;
+            }
+
+            axios
+                .delete(`http://localhost:5001/api/products/${id}`)
+                .then((res)=>{
+                    console.log(res.data);
+                    alert("Product delete successfully");
+                    fetchProducts();
+                })
+                .catch((err)=>{
+                    console.log((err));
+                    alert("Failed to save: " + (err.response?.data?.message || err.message));
+                })
+
+
+        }
 
     return (
         <div className='m-4'>
@@ -164,6 +186,10 @@ function ProductTable() {
                                                                     setErrors({});
                                                                 }}
                                                                 >Update</button>
+                                                            <button className='border p-2 rounded-2xl bg-blue-700 hover:bg-blue-900 text-white shadow-xl' onClick={()=>handleDelete(product._id)}>
+                                                                Delete
+                                                            </button>
+                                                                
                                                                 </td>
                             </tr>
                         ))}
