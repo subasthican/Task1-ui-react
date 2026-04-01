@@ -4,6 +4,7 @@ import Sidebar from './Sidebar'
 import TicketCard from './TicketCard';
 import ProductCard from './ProductCard';
 import ProductTable from "./ProductTable";
+import Login from "./Login"
 
 const tabs = [
   "Basic Information",
@@ -22,7 +23,8 @@ function App() {
 
   return (
     <div className="min-h-screen p-6 ">
-      <Sidebar />
+      {/* <Sidebar /> */}
+      <Login />
       
     
       
