@@ -20,7 +20,7 @@ function ProductTable() {
         axios
             .get('http://localhost:5001/api/products')
             .then((res) => {
-                setProducts(res.data.data?.products || []);
+                setProducts(res.data || []);
             })
             .catch((err) => console.log(err));
     };
